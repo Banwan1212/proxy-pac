@@ -1,0 +1,62 @@
+function FindProxyForURL(url, host) {
+    var rules = domain();
+    var n = rules.length;
+    var ret = "";
+    for (var i = 0; i < n; i++) {    
+        if (host == rules[i] || host.endsWith('.' + rules[i])) {
+            ret = rules[i];
+            break;
+        }
+    } 
+    if (host == ret || host.endsWith('.' + ret) || isInNet(host) || isChinaIP(host)) {
+        // HTTP 代理   
+        // return "PROXY 192.168.1.23:10802";
+        return "PROXY 192.168.2.161:10809";
+    } else {
+        return "DIRECT";
+    }
+}
+
+function domain() {
+    var name_add = [
+        "tiktok.com",
+        "gstatic.com",
+        "x.com",
+        "zzux.com"
+    ];    
+    return name_add;
+}
+
+function isInNet(host) {
+    var ip = dnsResolve(host);
+    if (ip == null) return false;
+    var pattern = "192.168.1.0";
+    var mask = "255.255.255.0";
+    var patternParts = pattern.split('.');
+    var maskParts = mask.split('.');
+    var ipParts = ip.split('.');
+    for (var i = 0; i < 4; i++) {
+        if ((patternParts[i] & maskParts[i]) != (ipParts[i] & maskParts[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function isChinaIP(host) {
+    // 使用外部 API 查询 IP 地址是否在中国
+    var geoipService = "https://api.geoiplookup.net/?query=" + host;
+    var response = httpGet(geoipService);
+    if (response) {
+        var country = JSON.parse(response).country_code;
+        return country === "CN";
+    }
+    return false;
+}
+
+function httpGet(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, false);
+    xhr.send();
+    return xhr.responseText;
+}
