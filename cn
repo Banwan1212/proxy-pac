@@ -1,0 +1,71 @@
+function FindProxyForURL(url, host) {
+    var rules = domain();
+    var n = rules.length;
+    var ret = "";
+    for (var i = 0; i < n; i++) {    
+        if (host == rules[i] || host.endsWith('.' + rules[i])) {
+            ret = rules[i];
+            break;
+        }
+    } 
+    if (host == ret || host.endsWith('.' + ret) || isInNet(host) || isChinaIP(host)) {
+        return "PROXY 192.168.2.161:10809";
+    } else {
+        return "DIRECT";
+    }
+}
+
+function domain() {
+    return [
+        "tiktok.com",
+        "gstatic.com",
+        "x.com",
+        "zzux.com"
+    ];
+}
+
+function isInNet(host) {
+    var ip = dnsResolve(host);
+    if (ip == null) return false;
+    var pattern = "192.168.1.0";
+    var mask = "255.255.255.0";
+    var patternParts = pattern.split('.');
+    var maskParts = mask.split('.');
+    var ipParts = ip.split('.');
+    for (var i = 0; i < 4; i++) {
+        if ((patternParts[i] & maskParts[i]) != (ipParts[i] & maskParts[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function isChinaIP(host) {
+    var ip = dnsResolve(host);
+    if (ip == null) return false;
+    // 静态的 GeoIP 数据
+    var chinaIPs = {
+        "1.0.0.0": 8,
+        "27.0.0.0": 8,
+        "36.0.0.0": 8,
+        // 根据需要添加更多范围
+    };
+    for (var base in chinaIPs) {
+        if (isInRange(ip, base, chinaIPs[base])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function isInRange(ip, base, maskBits) {
+    var ipParts = ip.split('.').map(Number);
+    var baseParts = base.split('.').map(Number);
+    var mask = -1 << (32 - maskBits);
+    for (var i = 0; i < 4; i++) {
+        if ((ipParts[i] & mask) != (baseParts[i] & mask)) {
+            return false;
+        }
+    }
+    return true;
+}
