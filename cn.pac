@@ -1,17 +1,34 @@
 function FindProxyForURL(url, host) {
-	var rules = domain();var n = rules.length;var ret ="";
- for (var i = 0; i < n; i++) 
-  {	
+	var rules = domain();
+	var n = rules.length;
+	var ret ="";
+	var proxy = "PROXY 192.168.2.161:10809"
+	
+for (var i = 0; i < n; i++) 
+    {	
       if (host == rules[i] || host.endsWith('.' + rules[i]))
          { var ret = rules[i];  break; }
-  } 
- if (isChinaIP(host) || isInNet(host) || host == ret || host.endsWith('.' + ret))
+  }
+  
+if(isInNet(host))
     {
-    return "PROXY 192.168.2.161:10809";
-    }
- else {    return "DIRECT";   }
- 
- function isInNet(host) {
+	return proxy;
+}
+else if(host == ret)
+	{
+	return proxy;
+	}
+else if(host.endsWith('.' + ret))
+	{
+	return proxy;
+	}
+else if(isChinaIP(host))
+	{
+	return "DIRECT";
+	}
+else{return "DIRECT";}
+
+function isInNet(host) {
     var ip = dnsResolve(host);
     if (ip == null) return false;
     var pattern = "192.168.1.0";
