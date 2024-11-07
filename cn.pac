@@ -2,7 +2,7 @@ function FindProxyForURL(url, host) {
 	var rules = domain();
 	var n = rules.length;
 	var ret ="";
-	var proxy = "PROXY 192.168.2.161:10809"
+	var proxy = "PROXY 192.168.1.116:10809"
 	
 for (var i = 0; i < n; i++) 
     {	
@@ -12,7 +12,7 @@ for (var i = 0; i < n; i++)
   
 if(isInNet(host))
     {
-	return proxy;
+	return "DIRECT";
 }
 else if(host == ret)
 	{
@@ -7263,7 +7263,7 @@ function isInRange(ip, range) {
 
 function domain(){
 var name_add = [
-            "tiktok.com",
+            "tmate.io",
             "gstatic.com",
             "x.com",
 	        "csp.withgoogle.com",
